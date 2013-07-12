@@ -27,8 +27,8 @@ describe "Ohai Output Comparison" do
     next_data = nested_data
     while next_path = path.shift
       searched_path << next_path
-      if next_data.respond_to?(:[]) && next_data = next_data[next_path]
-        # continue
+      if next_data.respond_to?(:[])
+        next_data = next_data[next_path]
       else
         path_description = "['#{deep_path.join("', '")}']"
         searched_path_des = "['#{searched_path.join("', '")}']"
@@ -78,6 +78,21 @@ describe "Ohai Output Comparison" do
   fuzzy_match 'system_profile', ANYTHING, '_timeStamp'
   fuzzy_match 'items', ANYTHING, '_SPCompletionInterval'
   fuzzy_match 'items', ANYTHING, '_timeStamp'
+
+  fuzzy_match 'memory', 'free'
+  fuzzy_match 'memory', 'cached'
+  fuzzy_match 'memory', 'active'
+  fuzzy_match 'memory', 'inactive'
+  fuzzy_match 'memory', 'dirty'
+  fuzzy_match 'memory', 'anon_pages'
+  fuzzy_match 'memory', 'mapped'
+  fuzzy_match 'memory', 'slab'
+  fuzzy_match 'memory', 'slab_unreclaim'
+  fuzzy_match 'memory', 'page_tables'
+  fuzzy_match 'memory', 'committed_as'
+  fuzzy_match 'idletime_seconds'
+  fuzzy_match 'idletime'
+
 
   platforms = Dir["#{RESULTS_DIR}/*"]
 
