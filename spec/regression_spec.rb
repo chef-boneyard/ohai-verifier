@@ -39,6 +39,46 @@ describe "Ohai Output Comparison" do
     next_data
   end
 
+  ANYTHING = Object.new
+
+  def ANYTHING.==(other)
+    true
+  end
+
+  FUZZY_MATCHES = []
+
+  def self.fuzzy_matches
+    FUZZY_MATCHES
+  end
+
+  def self.fuzzy_match(*path)
+    FUZZY_MATCHES << path
+  end
+
+  def self.fuzzy_match?(path)
+    fuzzy_matches.any? do |fuzzy_match_path|
+      fuzzy_match_path == path
+    end
+  end
+
+  fuzzy_match 'chef_packages', 'ohai', 'version'
+  fuzzy_match 'ohai_time'
+  fuzzy_match 'uptime'
+  fuzzy_match 'uptime_seconds'
+  fuzzy_match 'network', 'settings', 'net.inet.tcp.pcbcount'
+  fuzzy_match 'network', 'settings', 'net.inet.tcp.newreno_sockets'
+  fuzzy_match 'network', 'settings', 'net.inet.tcp.tcp_resched_timerlist'
+  fuzzy_match 'counters', 'network', 'interfaces', ANYTHING, 'rx', 'packets'
+  fuzzy_match 'counters', 'network', 'interfaces', ANYTHING, 'rx', 'bytes'
+  fuzzy_match 'counters', 'network', 'interfaces', ANYTHING, 'tx', 'packets'
+  fuzzy_match 'counters', 'network', 'interfaces', ANYTHING, 'tx', 'bytes'
+  fuzzy_match 'filesystem', ANYTHING, 'kb_used'
+  fuzzy_match 'filesystem', ANYTHING, 'kb_available'
+  fuzzy_match 'system_profile', ANYTHING, '_SPCompletionInterval'
+  fuzzy_match 'system_profile', ANYTHING, '_timeStamp'
+  fuzzy_match 'items', ANYTHING, '_SPCompletionInterval'
+  fuzzy_match 'items', ANYTHING, '_timeStamp'
+
   platforms = Dir["#{RESULTS_DIR}/*"]
 
   platforms.each do |platform_path|
@@ -58,8 +98,17 @@ describe "Ohai Output Comparison" do
 
             path_des = "['#{expected_path.join("', '")}']"
 
-            it "has the same value for #{path_des}" do
-              deep_fetch(new_data, expected_path).should == expected_value
+            if fuzzy_match?(expected_path)
+              it "has a similar value for #{path_des}" do
+                new_value = deep_fetch(new_data, expected_path)
+                new_value.should_not be_nil
+                new_value.class.should == expected_value.class
+              end
+            else
+              it "has the same value for #{path_des}" do
+                new_value = deep_fetch(new_data, expected_path)
+                new_value.should == expected_value
+              end
             end
 
           end
