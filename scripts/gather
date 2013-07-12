@@ -1,0 +1,23 @@
+#!/usr/bin/env ruby
+
+require 'fileutils'
+
+OLD_OHAI = File.expand_path("../../ohai-6.16.0/bin/ohai", __FILE__)
+NEW_OHAI = File.expand_path("../../ohai-6.18.0/bin/ohai", __FILE__)
+
+DATA_ROOT = File.expand_path("../../test-result/", __FILE__)
+
+uname = `uname -s -r`
+platform_descriptor = if uname.empty?
+                        "unknown"
+                      else
+                        uname.strip.gsub(/\s/, "-")
+                      end
+
+run_id = Time.now.to_i.to_s
+
+DATA_DIR = File.join(DATA_ROOT, platform_descriptor, run_id)
+FileUtils.mkdir_p(DATA_DIR)
+
+system("#{OLD_OHAI} -lerror > #{DATA_DIR}/old_ohai.json")
+system("#{OLD_OHAI} -lerror > #{DATA_DIR}/new_ohai.json")
