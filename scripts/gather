@@ -2,8 +2,11 @@
 
 require 'fileutils'
 
-OLD_OHAI = File.expand_path("../../ohai-6.16.0/bin/ohai", __FILE__)
-NEW_OHAI = File.expand_path("../../ohai-6.18.0/bin/ohai", __FILE__)
+OLD_REF = "6.16.0"
+NEW_REF = "OHAI-412"
+
+OHAI_CLONE = File.expand_path("../../ohai/", __FILE__)
+OHAI_BIN = File.expand_path("bin/ohai", OHAI_CLONE)
 
 DATA_ROOT = File.expand_path("../../test-result/", __FILE__)
 
@@ -19,5 +22,14 @@ run_id = Time.now.to_i.to_s
 DATA_DIR = File.join(DATA_ROOT, platform_descriptor, run_id)
 FileUtils.mkdir_p(DATA_DIR)
 
-system("#{OLD_OHAI} -lerror > #{DATA_DIR}/old_ohai.json")
-system("#{OLD_OHAI} -lerror > #{DATA_DIR}/new_ohai.json")
+Dir.chdir(OHAI_CLONE) do
+  system("git checkout #{OLD_REF}")
+  system("#{OHAI_BIN} -v")
+  puts("#{OHAI_BIN} -lerror > #{DATA_DIR}/old_ohai.json")
+  system("#{OHAI_BIN} -lerror > #{DATA_DIR}/old_ohai.json")
+
+  system("git checkout #{NEW_REF}")
+  system("#{OHAI_BIN} -v")
+  puts("#{OHAI_BIN} -lerror > #{DATA_DIR}/new_ohai.json")
+  system("#{OHAI_BIN} -lerror > #{DATA_DIR}/new_ohai.json")
+end

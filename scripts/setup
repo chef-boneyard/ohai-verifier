@@ -1,0 +1,5 @@
+#!/usr/bin/env ruby
+
+ohai_path = File.expand_path("../../ohai", __FILE__)
+
+system "git clone https://github.com/opscode/ohai.git"
