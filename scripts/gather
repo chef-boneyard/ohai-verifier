@@ -2,8 +2,8 @@
 
 require 'fileutils'
 
-OLD_REF = "6.16.0"
-NEW_REF = "OHAI-412"
+OLD_REF = "6.20.0"
+NEW_REF = "master"
 
 OHAI_CLONE = File.expand_path("../../ohai/", __FILE__)
 OHAI_BIN = File.expand_path("bin/ohai", OHAI_CLONE)
