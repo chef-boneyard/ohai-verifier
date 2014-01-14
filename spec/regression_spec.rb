@@ -80,6 +80,8 @@ describe "Ohai Output Comparison" do
   fuzzy_match 'items', ANYTHING, '_timeStamp'
 
   fuzzy_match 'memory', 'free'
+  fuzzy_match 'memory', 'buffers'
+  fuzzy_match 'memory', 'slab_reclaimable'
   fuzzy_match 'memory', 'cached'
   fuzzy_match 'memory', 'active'
   fuzzy_match 'memory', 'inactive'
