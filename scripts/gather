@@ -5,8 +5,11 @@ require 'fileutils'
 OLD_REF = "6.20.0"
 NEW_REF = "master"
 
+WINDOWS_RUBY_COMMAND = !!(RUBY_PLATFORM =~ /mswin|mingw|windows/) ?
+'ruby' : ''
+
 OHAI_CLONE = File.expand_path("../../ohai/", __FILE__)
-OHAI_BIN = File.expand_path("bin/ohai", OHAI_CLONE)
+OHAI_BIN = "#{WINDOWS_RUBY_COMMAND} " + File.expand_path("bin/ohai", OHAI_CLONE)
 
 DATA_ROOT = File.expand_path("../../test-result/", __FILE__)
 
@@ -15,6 +18,7 @@ platform_descriptor = if uname.empty?
                         "unknown"
                       else
                         uname.strip.gsub(/\s/, "-")
+                        uname.strip.gsub(/\//, "-") # '/' on Windows is problematic in file names
                       end
 
 run_id = Time.now.to_i.to_s
@@ -22,14 +26,17 @@ run_id = Time.now.to_i.to_s
 DATA_DIR = File.join(DATA_ROOT, platform_descriptor, run_id)
 FileUtils.mkdir_p(DATA_DIR)
 
+# Be sure to quote everything with DATA_DIR in the commands
+# below because on Windows it may contain a space, preventing
+# it from being parsed by the shell as a single parameter
 Dir.chdir(OHAI_CLONE) do
   system("git checkout #{OLD_REF}")
   system("#{OHAI_BIN} -v")
-  puts("#{OHAI_BIN} -lerror > #{DATA_DIR}/old_ohai.json")
-  system("#{OHAI_BIN} -lerror > #{DATA_DIR}/old_ohai.json")
+  puts("#{OHAI_BIN} -lerror > \"#{DATA_DIR}/old_ohai.json\"")
+  system("#{OHAI_BIN} -lerror > \"#{DATA_DIR}/old_ohai.json\"")
 
   system("git checkout #{NEW_REF}")
   system("#{OHAI_BIN} -v")
-  puts("#{OHAI_BIN} -lerror > #{DATA_DIR}/new_ohai.json")
-  system("#{OHAI_BIN} -lerror > #{DATA_DIR}/new_ohai.json")
+  puts("#{OHAI_BIN} -lerror > \"#{DATA_DIR}/new_ohai.json\"")
+  system("#{OHAI_BIN} -lerror > \"#{DATA_DIR}/new_ohai.json\"")
 end
