@@ -102,6 +102,7 @@ describe "Ohai Output Comparison" do
   fuzzy_match 'idletime'
 
   fuzzy_match 'kernel', "os_info", "free_physical_memory"
+  fuzzy_match 'kernel', "os_info", "free_space_in_paging_files"
   fuzzy_match 'kernel', "os_info", "free_virtual_memory"
   fuzzy_match 'kernel', "os_info", "local_date_time"
   fuzzy_match 'kernel', "os_info", "number_of_processes"
